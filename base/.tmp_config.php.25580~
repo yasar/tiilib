@@ -1,0 +1,46 @@
+<?php 
+class TConfig extends TBase {
+    private $config;
+    
+    public function __construct() {
+    }
+    
+    public function LoadFromFile($config, $type=T_CONFIG_FILE_TYPE_JSON) {
+        if (!isset($config))
+            throw new Exception('Config file name is not provided.');
+            
+        T::Import('helper/array.php');
+        switch($type){
+        	case T_CONFIG_FILE_TYPE_JSON:
+		        $this->config = TArray::Extend($this->config, (array) json_decode(file_get_contents($config)));
+				break;
+				
+			case T_CONFIG_FILE_TYPE_INI:
+					$this->config = TArray::Extend($this->config, parse_ini_file($config, true));
+				break;
+        }
+    }
+    
+    public function Get($path) {
+        $path = explode('/', $path);
+        $value = $this->config;
+        for ($i = 0, $n = count($path); $i < $n; $i++) {
+            $value = $value[$path[$i]];
+			is_object($value) && $value = (array) $value;
+        }
+        
+        return $value;
+    }
+	
+	public function Set($path, $value){
+        $path = explode('/', $path);
+        $config =& $this->config;
+        for ($i = 0, $n = count($path) - 1; $i < $n; $i++) {
+        	is_object($config) && $config =& $config->{$path[$i]};
+            is_array($config)  && $config =& $config[$path[$i]];
+        }
+		
+		is_object($config) && $config->{$path[$i]} = $value;
+        is_array($config)  && $config[$path[$i]]   = $value;
+	}
+}

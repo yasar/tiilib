@@ -2,7 +2,7 @@
 /**
  * @classDescription		The core class for the framework
  */
-class TiiCore extends TiiBase{
+class TCore extends TBase{
 	/**
 	 * Holds all the class member assignments..
 	 * 

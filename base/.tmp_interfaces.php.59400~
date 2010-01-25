@@ -1,6 +1,6 @@
 <?php
 
-interface TiiDbDriver
+interface TDbDriver
 {
 	public function Query($sql, $getFirstRowOnly=false, $fetch_type=null, $colum_index=null);
 	public function GetColumns($tablename);
@@ -16,7 +16,7 @@ interface TiiDbDriver
 }
 
 
-interface TiiUI{ //User interface
-	public function SetTemplateEngine(TiiTemplate $object);
+interface TUI{ //User interface
+	public function SetTemplateEngine(TTemplate $object);
 	public function GetHTML();
 }

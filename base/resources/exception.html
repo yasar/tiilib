@@ -1,0 +1,35 @@
+<style>
+	#exception {
+		border: 1px dotted #369;
+		margin: 10px;
+		padding: 10px;
+		font-size: 12px;
+	}
+	#exception *{
+		font-family: Arial;
+		font-size: 100%%;
+		
+	}
+	#exception .title{
+		color: #900;
+		font-size: 120%%;
+		font-weight: bold;
+	}
+	#exception li {
+		list-style: none;
+		padding: 0px;
+		margin :0px;
+	}
+	#exception label{
+		color: #666;
+	}
+</style>
+<div id="exception">
+	<span class="title">Uncaught %s</span>
+	<ul>
+		<li><label>Code :</label><span>%s</span></li>
+		<li><label>Message :</label><span>%s</span></li>
+		<li><label>File/Line :</label><span>%s at line %s</span></li>
+		<li><label>Trace :</label><pre>%s</pre></li>
+	</ul>
+</div>

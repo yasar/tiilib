@@ -1,0 +1,3 @@
+<?php
+define('TII_CONFIG_FILE_TYPE_INI',0);
+define('TII_CONFIG_FILE_TYPE_JSON',1);

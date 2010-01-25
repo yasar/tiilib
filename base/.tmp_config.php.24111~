@@ -1,0 +1,26 @@
+<?php 
+class TConfig extends TBase {
+    private $config;
+    
+    public function __construct() {
+    }
+    
+    public function LoadFromFile($config) {
+        if (!isset($config))
+            throw new Exception('Config file name is not provided.');
+            
+        T::Import('helper/array.php');
+        //$this->config = TArray::Extend($this->config, parse_ini_file($config, true));
+        $this->config = TArray::Extend($this->config, (Array) json_decode(file_get_contents($config)));
+    }
+    
+    public function Get($path) {
+        $path = explode('/', $path);
+        $value = $this->config;
+        for ($i = 0, $n = count($path); $i < $n; $i++) {
+            $value = $value[$path[$i]];
+        }
+        
+        return $value;
+    }
+}
