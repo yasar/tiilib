@@ -14,7 +14,6 @@ class TiiApplication extends TiiCore {
     protected $template_file;
     
     public function __construct() {
-    	//ob_start();
         $this->_name = pathinfo($this->GetCreatorsPath(), PATHINFO_BASENAME);
 		$this->_path = $this->GetCreatorsPath();
 		
@@ -24,11 +23,6 @@ class TiiApplication extends TiiCore {
 		$this->template_file = Tii::Config($this->Name() . '/template');
     }
 	
-	public function __destruct(){
-//		$buffer = ob_get_clean();
-//		
-//		$this->_Template->SetContent('page_content', $buffer);
-	}
     
     public function Name($str = null) {
         if (!is_null($str))
@@ -48,13 +42,13 @@ class TiiApplication extends TiiCore {
 	 * 
 	 * @return TiiApplication
 	 */
-    public function Application() {
-        //create the template object;
-        $this->_Template = new TiiTemplate();
-        
+    public function Init() {
         // check if the template_file is defined
         if ( empty($this->template_file))
             throw new Exception('Template file is not defined.');
+        
+        //create the template object;
+        $this->_Template = new TiiTemplate();
         
 		//pass the template file into Template object
         $this->_Template->SetTemplate($this->template_file);

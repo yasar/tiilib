@@ -1,7 +1,0 @@
-<?php
-class TiiApplication extends TiiCore{
-	
-	public function Name($val=null){
-		return $this->GetOrSet(__FUNCTION__,$val);
-	}
-}

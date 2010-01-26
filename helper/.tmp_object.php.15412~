@@ -1,5 +1,5 @@
 <?php 
-class TiiArray {
+class TArray {
 
     /**
      * Extend() - will take arrays as parameter, and will merge them
