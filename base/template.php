@@ -45,7 +45,22 @@ class TiiTemplate extends TiiCore {
             throw new Exception('Template file is not set.');
 			
         $this->DOM = file_get_html($this->template_file);
+	    //$this->DOM = new simple_html_dom($this->template_file);
+
+	    $this->ProcessTiiTags();
     }
+
+	private function ProcessTiiTags(){
+		//$this->DOM->find('input[type=hidden]');
+		$tiis = $this->DOM->find('tii');
+		foreach($tiis as &$tii){
+			Tii::Import('base/module.php');
+			Tii::Import('modules/login/module.php');
+			$Mdl = new Tii_Mdl_Login();
+			$x = $Mdl->LoginControl();
+			echo $x;exit;
+		}
+	}
     
     /**
      *
