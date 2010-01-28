@@ -24,4 +24,9 @@ class TiiModule extends TiiCore{
 		if(file_exists($config_file)) $this->Config->LoadFromFile($config_file);
 	}
 
+	protected function SetTemplate($template_file){
+		$this->Template->SetTemplate($template_file);
+		return $this->Template;
+	}
+
 }
