@@ -1,9 +1,15 @@
 <?php
 class TiiBase {
+	protected $path;
+
+	public function __construct(){
+	}
 
 	protected function GetCreatorsPath(){
 		$trace = debug_backtrace();
-		return array_shift(array_reverse(explode('/',dirname($trace[1]['file']))));
+		$arr = explode('/',dirname($trace[1]['file']));
+		$arr = array_reverse($arr);
+		return array_shift($arr);
 	}
 
 }

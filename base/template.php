@@ -7,7 +7,7 @@
  
 class TiiTemplate extends TiiCore {
     /**
-     * @var simple_html_dom_node
+     * @var simple_html_dom
      */
     private $DOM;
     
@@ -43,22 +43,66 @@ class TiiTemplate extends TiiCore {
     private function LoadDOM() {
         if ( empty($this->template_file))
             throw new Exception('Template file is not set.');
-			
-        $this->DOM = file_get_html($this->template_file);
-	    //$this->DOM = new simple_html_dom($this->template_file);
 
-	    $this->ProcessTiiTags();
+        if(! file_exists($this->template_file))
+        throw new Exception('Template file could not be found: '.$this->template_file);
+			
+        //$this->DOM = file_get_html($this->template_file);
+	    $this->DOM = new simple_html_dom($this->template_file);
+
+	   // $this->ProcessTiiTags();
+	    $this->DOM->set_callback(array('TiiTemplate','ProcessTiiTags'));
     }
 
-	private function ProcessTiiTags(){
-		//$this->DOM->find('input[type=hidden]');
-		$tiis = $this->DOM->find('tii');
-		foreach($tiis as &$tii){
-			Tii::Import('base/module.php');
-			Tii::Import('modules/login/module.php');
-			$Mdl = new Tii_Mdl_Login();
-			$x = $Mdl->LoginControl();
-			echo $x;exit;
+	public static function ProcessTiiTags(simple_html_dom_node $_element){
+		// all the variables defined in this function are starting with underscore (_)
+		// this is to make sure no any defined variable will be override by the extracted variables from the attributes.
+		
+		switch($_element->tag){
+			// look for tii tag
+			// eg: <tii type="Module" class="Account" method="LoginControl" params="" base_path="/tiilib/modules" />
+			case 'tii':
+				// check the attribute:type
+				switch($_element->getAttribute('type')){
+					case 'Module':
+						//base module is required in any case
+						Tii::Import('base/module.php');
+						// get all the attributes of the element: array(type,clas,...)
+						// then extract them to local variables
+						extract($_element->getAllAttributes());
+
+						// fix the class name
+						$class_name = 'TiiModule_Controller_'.$class;
+
+						// include the module file which includes the class_name definition
+						Tii::Import('modules/'.$class.'/module.php');
+						break;
+
+						
+					// if type attribute does not match anything
+					// then do not modify anything but return
+					default: return;
+				}
+
+				// create a reflection class for the module class
+				$_RClass = new ReflectionClass($class_name);
+
+				// check if the required method is available in the class
+				if($_RClass->hasMethod($method)) {
+					// create a new instance of the module class
+					$_CLASS = $_RClass->newInstance();
+
+					// invoke the requested method along with the parameters supplied
+					$_return = $_CLASS->$method(json_decode($params));
+
+					// replace the element with method's return value
+					$_element->outertext=$_return;
+				}else{
+					// if the method is not found, throw an exception
+					throw new Exception('Requested method is not defined: '.$class_name.'->'.$method.'()');
+				}
+
+				break;
 		}
 	}
     

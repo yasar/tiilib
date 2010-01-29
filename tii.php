@@ -8,6 +8,7 @@ class Tii {
 		'base/globals.php',
 		'base/base.php',
 		'base/core.php',
+		'base/controller.php',
 		'base/application.php',
 		'vendor/simple_html_dom.php',
 		'base/template.php',

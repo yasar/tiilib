@@ -6,27 +6,19 @@ class TiiModule extends TiiCore{
 	 */
 	protected $Config;
 
-	protected $Template;
 
-	protected $path;
 
 	public function __construct(){
-		$this->config = new TiiConfig();
-		$this->LoadConfig();
-
-		$this->Template = new TiiTemplate();
+		parent::__contruct();
 
 		$this->path = $this->GetCreatorsPath();
+
+		$this->config = new TiiConfig();
+		$this->LoadConfig();
 	}
 
 	private function LoadConfig(){
-		$config_file = $this->GetCreatorsPath() . '/config.json';
+		$config_file = $this->path . '/config.json';
 		if(file_exists($config_file)) $this->Config->LoadFromFile($config_file);
 	}
-
-	protected function SetTemplate($template_file){
-		$this->Template->SetTemplate($template_file);
-		return $this->Template;
-	}
-
 }

@@ -9,7 +9,11 @@ class TiiCore extends TiiBase{
 	 * @var Array
 	 */
 	private $variables=array();
-	
+
+	public function __construct(){
+		parent::__construct();
+	}
+
 	/**
 	 * Magic function, Setter()
 	 * 
