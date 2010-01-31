@@ -42,6 +42,8 @@ class Tii {
      */
     static private $_apps;
     
+    static public $debug = false;
+    
     static public function Init($config_file = null, $validate=false) {
     	self::$_start_time = microtime(true);
 		
@@ -55,15 +57,11 @@ class Tii {
 		// if a config_file is passed in, load it
 		if (! is_null($config_file)) self::LoadConfig($config_file);
 		
-		if($validate) self::Validate();
+		//if (self::Config('debug')))
     }
 	
 	static public function LoadConfig($config_file){
 		self::$_Config->LoadFromFile($config_file);
-	}
-	
-	static private function Validate(){
-		
 	}
 	
 	static public function Config($path, $value = null){
@@ -74,6 +72,7 @@ class Tii {
     /**
      * Imports/includes the given file
      * and returns the reference to Tii
+     * ex: Tii::Import('helper/array.php');
      *
      * @param string $path
      * @return Tii
@@ -96,7 +95,7 @@ class Tii {
      * @param string $name
      * @return TiiApplication
      */
-    static public function CreateApp($app_name) {
+    static public function CreateApp($app_name, $init=true) {
     	$path = TII_PATH_ROOT.'/apps/'.strtolower($app_name).'/application.php';
 		if (! file_exists($path)) throw new Exception (Tii::Out('Application "%s" could not be found at: %s', $app_name, $path));
     	
@@ -106,6 +105,8 @@ class Tii {
 		
 		
         self::$_apps[] = self::$_App = new $app_name();
+        
+        if($init) self::$_App->Init();
 		
 		return self::$_App;
     }

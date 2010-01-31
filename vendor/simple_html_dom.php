@@ -258,6 +258,11 @@ class simple_html_dom_node {
     }
 
     // find elements by css selector
+	/**
+	 * @param  $selector
+	 * @param  $idx
+	 * @return simple_html_dom_node | array
+	 */
     function find($selector, $idx=null) {
         $selectors = $this->parse_selector($selector);
         if (($count=count($selectors))===0) return array();
@@ -479,6 +484,9 @@ class simple_html_dom_node {
 // simple html dom parser
 // -----------------------------------------------------------------------------
 class simple_html_dom {
+	/**
+	 * @var simple_html_dom_node
+	 */
     public $root = null;
     public $nodes = array();
     public $callback = null;
@@ -573,6 +581,11 @@ class simple_html_dom {
     }
 
     // find dom node by css selector
+	/**
+	 * @param  $selector
+	 * @param  $idx
+	 * @return simple_html_dom_node|array
+	 */
     function find($selector, $idx=null) {
         return $this->root->find($selector, $idx);
     }

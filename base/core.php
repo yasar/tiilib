@@ -10,6 +10,12 @@ class TiiCore extends TiiBase{
 	 */
 	private $variables=array();
 
+	/**
+	 * Holds the class variables list with their permissions
+	 * @var Array
+	 */
+	//protected $_var_permissions=array();
+
 	public function __construct(){
 		parent::__construct();
 	}
@@ -24,9 +30,13 @@ class TiiCore extends TiiBase{
 	 * @return 
 	 */
 	public function __set($var, $val){
+		//error_log('__set');
+		//if(in_array($var, $this->_var_permissions['deny_set'])) return;
+		//if (in_array($var, get_class_vars())) $this->{$var} = $val;
+		//else 
 		$this->variables[$var] = $val;
 	}
-	
+
 	/**
 	 * Magic function, Getter()
 	 * 
@@ -38,10 +48,11 @@ class TiiCore extends TiiBase{
 	 * @return 
 	 */
 	public function __get($var){
-		return 
+		return
 			isset($this->{$var})
 			? $this->variables[$var]
 			: null;
+		//return in_array($var, get_class_vars(__CLASS__)) ? $this->{$var} : isset($this->variables[$var]) ? $this->variables[$var] : null;
 	}
 	
 	/**
@@ -67,14 +78,19 @@ class TiiCore extends TiiBase{
 	 * USAGE:
 	 * public function SqlQuery($val=null){return $this->GetOrSet(__FUNCTION__,$val);}
 	 * 
-	 * @param {string} $var Method name to set/get the property
-	 * @param {string} [$val] the value to be set for the property
-	 * @return {TCore}
+	 * @param string $var Method name to set/get the property
+	 * @param string optional $val the value to be set for the property
+	 * @param string optional $default the value to be set for the property when get is invoked but property has never been set before
+	 * @return TCore
 	 */
-	protected function GetOrSet($var,$val=null){
-		if (is_null($val)) return $this->{$var};
+	protected function GetOrSet($var,$val=null,$default=null){
+		if (is_null($val)) {
+			if(! is_null($default) && ! isset($this->{$var})) $this->{$var} = $default;
+			return $this->{$var};	
+		}
 		$this->{$var} = $val;
 		return $this;
+
 	}
 	
 	/**

@@ -21,7 +21,13 @@ class TiiTemplate extends TiiCore {
     
     private $html;
     
+    private $scripts=array();
+    private $styles=array();
+    private $includes=array();
+
     public function __construct($template_file = null) {
+	    //$this->_var_permissions['deny_set'] = array('DOM');
+	    
         if (! empty($template_file))
             $this->SetTemplate($template_file);
     }
@@ -29,7 +35,34 @@ class TiiTemplate extends TiiCore {
     public function __destruct() {
         unset($this->DOM);
     }
-    
+	
+	
+	public function AddScript($file, $idx=999){
+		if ($this->IsIncluded($file)) return $this;
+		
+		if (! file_exists($file)){
+			error_log(Tii::Out('File could not be found: %s. %s() in %s:  ',$file,__METHOD__,__FILE__), E_USER_WARNING);
+			return true;
+		}
+		$this->scripts[$idx][]=$file;
+		$this->includes[]=$file;
+	}
+
+	public function AddStyle($file, $idx=999){
+		if ($this->IsIncluded($file)) return $this;
+		
+		if (! file_exists($file)){
+			error_log(Tii::Out('File could not be found: %s. %s() in %s:  ',$file,__METHOD__,__FILE__), E_USER_WARNING);
+			return true;
+		}
+		$this->styles[$idx][]=$file;
+		$this->includes[]=$file;
+	}
+	
+	public function IsIncluded($file){
+		return in_array($file, $this->includes);
+	}
+	
     /**
      * @param string $s
      * @return TiiTemplate
@@ -39,6 +72,11 @@ class TiiTemplate extends TiiCore {
         $this->LoadDOM();
         return $this;
     }
+    
+    /**
+     * @return simple_html_dom
+     */ 
+    public function DOM(){return $this->DOM();}
     
     private function LoadDOM() {
         if ( empty($this->template_file))
@@ -53,7 +91,59 @@ class TiiTemplate extends TiiCore {
 	   // $this->ProcessTiiTags();
 	    $this->DOM->set_callback(array('TiiTemplate','ProcessTiiTags'));
     }
-
+    
+    /**
+     *  @return TiiTemplate 
+     */
+    public function ProcessModuleTemplate($params){
+        if (is_null($params) || empty($params) || !is_array($params)) return $this;
+        
+        Tii::Import('helper/html.php');
+        
+		if($holder = $this->DOM->find('#holder',0)){
+			$holder->setAttribute('id',$params['holder']['id']);
+		}
+        
+		if($buttons_holder = $this->DOM->find('#buttons_holder',0)){
+			$buttons_holder->setAttribute('id',$params['buttons_holder']['id']);
+		}
+        
+        // loop through all the fields
+        foreach($params['fields'] as $field => $attributes){
+            $id = 'field_'.$field;
+            
+            // find the el in the DOM
+            $el = $this->DOM->find('#'.$id, 0);
+            if($el !== false) {
+                // if found, replace it with relevant html tag
+                $el->outertext = TiiHtml::GetTag($attributes);
+                
+                if (isset($attributes['label'])){
+                    // check if there is label for this tag
+                    $el_label = $this->DOM->find('label[for="'.$id.'"]',0);
+                    if($el_label !== false) {
+                        $el_label->setAttribute('for', $attributes['id']);
+                        $el_label->innertext=$attributes['label'];
+                    }
+                }
+            }
+        }
+        
+        // loop through all the buttons
+        foreach($params['buttons'] as $button => $attributes){
+            $id = 'button_'.$field;
+            
+            // find the el in the DOM
+            $el = $this->DOM->find('#'.$id, 0);
+            if($el !== false && $el instanceof simple_html_dom_node) {
+                // if found, replace it with relevant html tag
+                $el->outertext = TiiHtml::GetTag($attributes);
+            }
+        }
+        
+        return $this;
+    }
+    
 	public static function ProcessTiiTags(simple_html_dom_node $_element){
 		// all the variables defined in this function are starting with underscore (_)
 		// this is to make sure no any defined variable will be override by the extracted variables from the attributes.
@@ -92,8 +182,21 @@ class TiiTemplate extends TiiCore {
 					// create a new instance of the module class
 					$_CLASS = $_RClass->newInstance();
 
+					// check is attribute:params is supplied
+					$params = $_element->getAttribute('params');
+
+					if($params !== false) {
+						// make sure the supplied params which is in json format,
+						// has the keys double quoted.
+						$params = json_decode(str_replace('\'','"',$params), true);
+					}
+					else {
+						// if no params is supplied, then set it to an empty array.
+						$params = null;
+					}
+                    
 					// invoke the requested method along with the parameters supplied
-					$_return = $_CLASS->$method(json_decode($params));
+					$_return = $_CLASS->{$method}($params);
 
 					// replace the element with method's return value
 					$_element->outertext=$_return;
@@ -134,8 +237,11 @@ class TiiTemplate extends TiiCore {
     public function GetHTML($node_selector = '') {
         if (! empty($node_selector))
             $this->html = $this->DOM->find('[id='.$node_selector.']', 0)->outertext();
-        else
+        else{
+        	$head = $this->DOM->find('head', 0);
+        	$head->innertext = $head->innertext . '<script src="test.php"></script>';
             $this->html = $this->DOM->root->innertext();
+        }
         //$this->html = str_replace(chr(10), '', $this->html);
         return $this->html;
     }

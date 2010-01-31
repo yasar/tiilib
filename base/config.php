@@ -44,7 +44,9 @@ class TiiConfig extends TiiBase {
 		$value = $this->config;
 		for ($i = 0, $n = count($path); $i < $n; $i++) {
 			if (!isset($value[$path[$i]])){
-				throw new Exception(Tii::Out('Path "%s" is not valid in the configuration', $path[$i]));
+				//throw new Exception(Tii::Out('Path "%s" is not valid in the configuration', $path[$i]));
+				error_log(Tii::Out('Path "%s" is not valid in the configuration', $path[$i]), E_USER_NOTICE);
+				return false;
 			}
 			$value = $value[$path[$i]];
 			is_object($value) && $value = (array) $value;
