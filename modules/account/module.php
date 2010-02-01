@@ -54,14 +54,26 @@ class TiiModule_Controller_Account extends TiiController{
             Tii::Import('helper/array.php');
             $params = TiiArray::ExtendDeeper($default, $params);
         }else $params =& $default;
-        
+        //echo '****';
         Tii::App()->Template()->AddScript($this->Path().'/templ/login.js');
         Tii::App()->Template()->AddStyle($this->Path().'/templ/login.css');
         
+        //exit;
+        /*
 		return $this
             ->SetTemplate($this->path.'/templ/login.html', $absolute_path=true)
             ->ProcessModuleTemplate($params)
             ->GetHTML()
             ;
+            */
+		$this
+            ->SetTemplate($this->path.'/templ/login.html', $absolute_path=true)
+            ->ProcessModuleTemplate($params)
+            ;
+        
+        //exit;
+        $html = $this->Template->GetHTML();
+        //var_dump(Tii::App()->Template()->scripts);
+        return $html;    
 	}
 }

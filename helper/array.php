@@ -36,4 +36,20 @@ class TiiArray
         return $merged;
 
     }
+    
+    
+    /**
+     * takes a multi-dimensional array, and flattens into a zero indexed array.
+     */
+    public static function Flatten($array, $flat = false){
+        if (!is_array($array) || empty($array)) return ''; 
+        if (empty($flat)) $flat = array(); 
+            
+        foreach ($array as $key => $val) { 
+          if (is_array($val)) $flat = self::Flatten($val, $flat); 
+          else $flat[] = $val; 
+        } 
+            
+        return $flat; 
+    }
 }

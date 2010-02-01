@@ -89,6 +89,9 @@ class simple_html_dom_node {
     public $parent = null;
     public $_ = array();
     private $dom = null;
+    
+    private $_innertext=''; //added by yasarbayar@gmail.com
+    private $_innertext_prepared = false; //added by yasarbayar@gmail.com
 
     function __construct($dom) {
         $this->dom = $dom;
@@ -163,14 +166,26 @@ class simple_html_dom_node {
     }
 
     // get dom node's inner html
-    function innertext() {
-        if (isset($this->_[HDOM_INFO_INNER])) return $this->_[HDOM_INFO_INNER];
-        if (isset($this->_[HDOM_INFO_TEXT])) return $this->dom->restore_noise($this->_[HDOM_INFO_TEXT]);
+    function prepare_innertext() {
+        if (isset($this->_[HDOM_INFO_INNER])) {
+            $this->_innertext = $this->_[HDOM_INFO_INNER];
+            return;
+        }
+        if (isset($this->_[HDOM_INFO_TEXT])) {
+            $this->_innertext = $this->dom->restore_noise($this->_[HDOM_INFO_TEXT]);
+            return;
+        }
 
         $ret = '';
         foreach($this->nodes as $n)
             $ret .= $n->outertext();
-        return $ret;
+        $this->_innertext = $ret;
+        $this->_innertext_prepared = true;
+    }
+    
+    function innertext($prepare=true){
+        if($prepare) $this->prepare_innertext();
+        return $this->_innertext;
     }
 
     // get dom node's outer text (with tag)
@@ -435,10 +450,12 @@ class simple_html_dom_node {
     }
 
     function __set($name, $value) {
+        //if($name=='innertext')echo $name,':',$value,'<hr />';
         switch($name) {
             case 'outertext': return $this->_[HDOM_INFO_OUTER] = $value;
             case 'innertext':
-                if (isset($this->_[HDOM_INFO_TEXT])) return $this->_[HDOM_INFO_TEXT] = $value;
+                if (isset($this->_[HDOM_INFO_TEXT]))
+                    return $this->_[HDOM_INFO_TEXT] = $value;
                 return $this->_[HDOM_INFO_INNER] = $value;
         }
         if (!isset($this->attr[$name])) {

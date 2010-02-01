@@ -21,13 +21,14 @@ class TiiTemplate extends TiiCore {
     
     private $html;
     
-    private $scripts=array();
+    public $scripts=array();
     private $styles=array();
     private $includes=array();
 
     public function __construct($template_file = null) {
 	    //$this->_var_permissions['deny_set'] = array('DOM');
-	    
+	    parent::__construct();
+       // echo 'Template created : ',$this->ID(),'<br />';
         if (! empty($template_file))
             $this->SetTemplate($template_file);
     }
@@ -197,7 +198,10 @@ class TiiTemplate extends TiiCore {
                     
 					// invoke the requested method along with the parameters supplied
 					$_return = $_CLASS->{$method}($params);
-
+                    //echo '<hr />'.'='.Tii::App()->Template()->ID().'<hr/>';
+                    //var_dump(Tii::App()->Template()->scripts);
+                    //throw new Exception('qqq');
+                    
 					// replace the element with method's return value
 					$_element->outertext=$_return;
 				}else{
@@ -235,15 +239,53 @@ class TiiTemplate extends TiiCore {
     }
     
     public function GetHTML($node_selector = '') {
+        //throw new Exception();
         if (! empty($node_selector))
             $this->html = $this->DOM->find('[id='.$node_selector.']', 0)->outertext();
         else{
-        	$head = $this->DOM->find('head', 0);
-        	$head->innertext = $head->innertext . '<script src="test.php"></script>';
-            $this->html = $this->DOM->root->innertext();
+            $this->DOM->root->prepare_innertext();
+            $this->ParseScripts();
+            $this->html = $this->DOM->root->innertext(false);
         }
         //$this->html = str_replace(chr(10), '', $this->html);
+        
         return $this->html;
+    }
+    
+    private function ParseScripts(){
+        //echo '<hr />'.self::ID().'='.Tii::App()->Template()->ID().'<hr/>';
+        //echo $this->template_file, '-ID:', $this->ID(),'<br />';
+        //echo $this->template_file,'<br />';
+        //var_dump($this->scripts);
+        //echo '<hr>';
+        if(count($this->scripts) == 0) return;
+        
+        Tii::Import('helper/array.php');
+        
+        $scripts = TiiArray::Flatten($this->scripts);
+        
+        //var_dump($this->includes);
+        //echo $this->ID(),' : ', var_dump($scripts),'<hr />';
+
+        foreach($scripts as $script) $this->AddToHead($script,'<script type="text/javascript" src="%s"></script>');
+        return $this;
+    }
+    
+    private function ParseStyles(){
+        foreach($this->styles as $styles) $this->AddToHead($script);
+        
+        return $this;
+    }
+    
+    private function AddToHead($html, $format=null){
+        static $head;
+        if (!isset($head)) $head =& $this->DOM->find('head', 0);
+        
+        if(! is_null($format) && ! empty($format)) $html = Tii::Out($format,$html);
+        
+        $head->innertext = $head->innertext() . $html;
+        
+        return $this;
     }
     
     /**

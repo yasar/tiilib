@@ -45,7 +45,7 @@ class Tii {
     static public $debug = false;
     
     static public function Init($config_file = null, $validate=false) {
-    	self::$_start_time = microtime(true);
+        self::$_start_time = microtime(true);
 		
     	foreach(self::$_imports as $import){
     		self::Import($import);
@@ -132,8 +132,10 @@ class Tii {
         if (is_null($name)) {
             if (count(self::$_apps) == 1)
                 return array_pop(self::$_apps);
+                
             elseif (count(self::$_apps) > 1)
                 throw new Exception('Application name is not provided.');
+                
             else
                 throw new Exception('There is no any application created.');
         }

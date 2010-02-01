@@ -17,6 +17,7 @@ class TiiApplication extends TiiCore {
     protected $template_file;
 
     public function __construct() {
+        parent::__construct();
     	//prevent the following variables to be set from outside the class; 
 		//$this->_var_permissions['deny_set']=array('Template');
     	
