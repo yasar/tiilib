@@ -245,7 +245,7 @@ class TiiTemplate extends TiiCore {
         else{
             $this->DOM->root->prepare_innertext();
             $this->ParseScripts();
-            $this->html = $this->DOM->root->innertext(false);
+            $this->html = $this->DOM->root->innertext();
         }
         //$this->html = str_replace(chr(10), '', $this->html);
         
@@ -253,21 +253,14 @@ class TiiTemplate extends TiiCore {
     }
     
     private function ParseScripts(){
-        //echo '<hr />'.self::ID().'='.Tii::App()->Template()->ID().'<hr/>';
-        //echo $this->template_file, '-ID:', $this->ID(),'<br />';
-        //echo $this->template_file,'<br />';
-        //var_dump($this->scripts);
-        //echo '<hr>';
         if(count($this->scripts) == 0) return;
         
         Tii::Import('helper/array.php');
         
         $scripts = TiiArray::Flatten($this->scripts);
         
-        //var_dump($this->includes);
-        //echo $this->ID(),' : ', var_dump($scripts),'<hr />';
-
         foreach($scripts as $script) $this->AddToHead($script,'<script type="text/javascript" src="%s"></script>');
+
         return $this;
     }
     
@@ -279,7 +272,8 @@ class TiiTemplate extends TiiCore {
     
     private function AddToHead($html, $format=null){
         static $head;
-        if (!isset($head)) $head =& $this->DOM->find('head', 0);
+        
+        if (!isset($head)) $head = $this->DOM->find('head', 0);
         
         if(! is_null($format) && ! empty($format)) $html = Tii::Out($format,$html);
         
