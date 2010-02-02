@@ -1,10 +1,5 @@
 <?php 
-/********************************************************
- $Rev: 16 $:
- $Author: yasar $:
- $Date: 2009-09-01 00:29:25 -0700 (Tue, 01 Sep 2009) $:
- *********************************************************/
- 
+
 class TiiTemplate extends TiiCore {
     /**
      * @var simple_html_dom
@@ -38,7 +33,13 @@ class TiiTemplate extends TiiCore {
     }
 	
 	
+    /**
+     * 
+     * @return TiiTemplate
+     */ 
 	public function AddScript($file, $idx=999){
+        $file = realpath($file);
+        
 		if ($this->IsIncluded($file)) return $this;
 		
 		if (! file_exists($file)){
@@ -47,8 +48,14 @@ class TiiTemplate extends TiiCore {
 		}
 		$this->scripts[$idx][]=$file;
 		$this->includes[]=$file;
+        
+        return $this;
 	}
 
+    /**
+     * 
+     * @return TiiTemplate
+     */ 
 	public function AddStyle($file, $idx=999){
 		if ($this->IsIncluded($file)) return $this;
 		
@@ -58,6 +65,8 @@ class TiiTemplate extends TiiCore {
 		}
 		$this->styles[$idx][]=$file;
 		$this->includes[]=$file;
+        
+        return $this;
 	}
 	
 	public function IsIncluded($file){
@@ -117,7 +126,7 @@ class TiiTemplate extends TiiCore {
             $el = $this->DOM->find('#'.$id, 0);
             if($el !== false) {
                 // if found, replace it with relevant html tag
-                $el->outertext = TiiHtml::GetTag($attributes);
+                $el->outertext = TiiHlpHtml::GetTag($attributes);
                 
                 if (isset($attributes['label'])){
                     // check if there is label for this tag
@@ -138,7 +147,7 @@ class TiiTemplate extends TiiCore {
             $el = $this->DOM->find('#'.$id, 0);
             if($el !== false && $el instanceof simple_html_dom_node) {
                 // if found, replace it with relevant html tag
-                $el->outertext = TiiHtml::GetTag($attributes);
+                $el->outertext = TiiHlpHtml::GetTag($attributes);
             }
         }
         
@@ -244,7 +253,7 @@ class TiiTemplate extends TiiCore {
             $this->html = $this->DOM->find('[id='.$node_selector.']', 0)->outertext();
         else{
             $this->DOM->root->prepare_innertext();
-            $this->ParseScripts();
+            $this->ParseScripts()->ParseStyles();
             $this->html = $this->DOM->root->innertext();
         }
         //$this->html = str_replace(chr(10), '', $this->html);
@@ -252,22 +261,60 @@ class TiiTemplate extends TiiCore {
         return $this->html;
     }
     
+    /**
+     * @return TiiTemplate
+     */ 
     private function ParseScripts(){
-        if(count($this->scripts) == 0) return;
+        if(($filename = $this->ParseFiles($this->scripts,'js')) !== false){
+            // add this cache file to the template
+            $this->AddToHead(TII_URL_ROOT.$filename,'<script type="text/javascript" src="%s"></script>');
+        }
         
-        Tii::Import('helper/array.php');
-        
-        $scripts = TiiArray::Flatten($this->scripts);
-        
-        foreach($scripts as $script) $this->AddToHead($script,'<script type="text/javascript" src="%s"></script>');
-
         return $this;
     }
     
+    /**
+     * @return TiiTemplate
+     */ 
     private function ParseStyles(){
-        foreach($this->styles as $styles) $this->AddToHead($script);
+        if(($filename = $this->ParseFiles($this->styles,'css')) !== false){
+            // add this cache file to the template
+            $this->AddToHead(TII_URL_ROOT.$filename,'<link href="%s" rel="stylesheet" type="text/css">');
+        }
         
         return $this;
+    }
+    
+    private function ParseFiles($files=array(),$ext='txt'){
+        // if not any script is included, then return without doing anything
+        if(count($files) == 0) return false;
+        
+        // import the array helper
+        Tii::Import('helper/array.php');
+        
+        // $this->scripts is multi-dimensional array, can hold multiple script file names at the same index
+        // so flatten them to be one dimensional, so that we can iterate them easily. 
+        $files = TiiHlpArray::Flatten($files);
+        
+        // generat the filename based on the included scripts using the md5
+        $filename = TII_DIR_CACHE.'/'.md5(implode('*',$files)).'.'.$ext;
+        
+        // if cache is disabled or this file is already exist in the cache, use it
+        if(! Tii::Config('use_cache') || !file_exists(TII_PATH_ROOT.$filename)){
+            // include the file class
+            Tii::Import('base/file.php');
+            
+            // instanciate the file class and create the script file in the cache 
+            $F = new TiiFile(TII_PATH_ROOT.$filename, TiiFile::MODE_WRITE_ONLY);
+            
+            // loop through all the included scripts
+            foreach($files as $file){
+                // read the content of the script and add it to the created script file
+                $F->Write(chr(10).chr(10).'/****| '.$file.' |****/'.chr(10).file_get_contents($file));
+            }
+        }
+        
+        return $filename;
     }
     
     private function AddToHead($html, $format=null){
@@ -275,7 +322,7 @@ class TiiTemplate extends TiiCore {
         
         if (!isset($head)) $head = $this->DOM->find('head', 0);
         
-        if(! is_null($format) && ! empty($format)) $html = Tii::Out($format,$html);
+        if(! is_null($format) && ! empty($format)) $html = Tii::Out($format,$html).chr(10);
         
         $head->innertext = $head->innertext() . $html;
         

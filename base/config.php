@@ -21,11 +21,11 @@ class TiiConfig extends TiiBase {
 		Tii::Import('helper/array.php');
 		switch ($type) {
 			case TII_CONFIG_FILE_TYPE_JSON:
-				$this->config = TiiArray::Extend($this->config, (array) json_decode(file_get_contents($config_file)));
+				$this->config = TiiHlpArray::Extend($this->config, (array) json_decode(file_get_contents($config_file)));
 				break;
 
 			case TII_CONFIG_FILE_TYPE_INI:
-				$this->config = TiiArray::Extend($this->config, parse_ini_file($config_file, true));
+				$this->config = TiiHlpArray::Extend($this->config, parse_ini_file($config_file, true));
 				break;
 		}
 	}

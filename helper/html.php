@@ -1,6 +1,6 @@
 <?php
 
-class TiiHtml
+class TiiHlpHtml
 {
     const DEFAULT_TAG = 'input';
 

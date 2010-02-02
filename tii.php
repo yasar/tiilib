@@ -1,7 +1,9 @@
 <?php 
 if (!defined('TII_PATH_ROOT'))
     throw new Exception('TII_PATH_ROOT constant is not defined');
-defined('TII_PATH_FRAMEWORK') || define('TII_PATH_FRAMEWORK', dirname(__FILE__));
+    
+if (!defined('TII_PATH_FRAMEWORK'))
+    throw new Exception('TII_PATH_FRAMEWORK constant is not defined');
 
 class Tii {
 	static private $_imports = array(

@@ -52,7 +52,7 @@ class TiiModule_Controller_Account extends TiiController{
         
 		if(! is_null($params) && ! empty($params) && is_array($params) ) {
             Tii::Import('helper/array.php');
-            $params = TiiArray::ExtendDeeper($default, $params);
+            $params = TiiHlpArray::ExtendDeeper($default, $params);
         }else $params =& $default;
         //echo '****';
         Tii::App()->Template()->AddScript($this->Path().'/templ/login.js');
