@@ -1,10 +1,10 @@
 <?php 
 class TiiApplication extends TiiCore {
     // holds the application name
-	//private $name;
+	private $name;
 
 	// holds the application path
-	//private $path;
+	private $path;
 
     /**
      * @var TiiTemplate
@@ -18,23 +18,11 @@ class TiiApplication extends TiiCore {
 
     public function __construct() {
         parent::__construct();
-    	//prevent the following variables to be set from outside the class; 
-		//$this->_var_permissions['deny_set']=array('Template');
-    	
-        //$this->name = pathinfo($this->GetCreatorsPath(), PATHINFO_BASENAME);
-		
-
-        // load the application config file
-        //echo $this->Path();exit;
+        
         Tii::LoadConfig($this->Path().'/config.json');
 
 		$this->template_file = Tii::Config($this->Name() . '/template');
     }
-    /*
-    public function __set($var, $val){
-    	parent::__set($var, $val);
-    }
-	*/
 	
 	/**
 	 * @return TiiApplication|String

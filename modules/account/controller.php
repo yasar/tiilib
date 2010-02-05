@@ -10,7 +10,6 @@ class TiiModuleController_Account extends TiiController{
         Tii::Import('modules/account/module.php');
         $this->Module = new TiiModule_Account();
         $this->Module->Controller(& $this);
-        //var_dump($this->Module->Controller());
 	}
 
 	public function LoginControl($params=null){

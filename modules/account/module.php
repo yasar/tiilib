@@ -46,13 +46,11 @@ class TiiModule_Account extends TiiModule{
         Tii::App()->Template()->AddScript($this->Path().'/templ/login.js');
         Tii::App()->Template()->AddStyle($this->Path().'/templ/login.css');
         
-		$this->Controller()
-            ->SetTemplate($this->path.'/templ/login.html', $absolute_path=true)
+		return $this->Controller()
+            ->Template($this->path.'/templ/login.html', $absolute_path=true)
             ->ProcessModuleTemplate($params)
+            ->GetHTML()
             ;
-        
-        
-        return $this->Template->GetHTML();
 	}
 }
 

@@ -33,9 +33,9 @@ class TiiController extends TiiCore
 		return $this->GetOrSet(__FUNCTION__, $val, $this->GetCreatorsPath());
 	}
 	
-    protected function SetTemplate($template_file, $absolute_path = false)
+    public function Template($template_file=null, $absolute_path = false)
     {
-        $this->Template->SetTemplate($template_file, $absolute_path);
+        if(! is_null($template_file)) $this->Template->SetTemplate($template_file, $absolute_path);
         return $this->Template;
     }
 }
