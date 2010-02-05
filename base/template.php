@@ -31,6 +31,16 @@ class TiiTemplate extends TiiCore {
     public function __destruct() {
         unset($this->DOM);
     }
+    
+	/**
+	 * Set or Return the application path
+	 * which is the absolute path to where the created application's application.php file is residing
+	 *
+	 * @return String
+	 */
+	public function Path($val = null){
+		return $this->GetOrSet(__FUNCTION__, $val, $this->GetCreatorsPath());
+	}
 	
 	
     /**
@@ -172,10 +182,11 @@ class TiiTemplate extends TiiCore {
 						extract($_element->getAllAttributes());
 
 						// fix the class name
-						$class_name = 'TiiModule_Controller_'.$class;
+						$class_name = 'TiiModuleController_'.$class;
 
-						// include the module file which includes the class_name definition
-						Tii::Import('modules/'.$class.'/module.php');
+						// include the controller file 
+                        // which includes the class_name definition
+						Tii::Import('modules/'.$class.'/controller.php');
 						break;
 
 						

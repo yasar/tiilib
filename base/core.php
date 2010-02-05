@@ -2,7 +2,7 @@
 /**
  * @classDescription		The core class for the framework
  */
-class TiiCore extends TiiBase{
+abstract class TiiCore extends TiiBase{
 	/**
 	 * Holds all the class member assignments..
 	 * 
@@ -10,16 +10,20 @@ class TiiCore extends TiiBase{
 	 */
 	private $variables=array();
 
-	/**
-	 * Holds the class variables list with their permissions
-	 * @var Array
-	 */
-	//protected $_var_permissions=array();
-
+    //protected $path;
+    abstract public function Path();
+    
 	public function __construct(){
 		parent::__construct();
 	}
 
+	protected function GetCreatorsPath($level=1){
+		$trace = debug_backtrace();
+		$arr = explode('/',dirname($trace[$level]['file']));
+		$arr = array_reverse($arr);
+		return array_shift($arr);
+	}
+    
 	/**
 	 * Magic function, Setter()
 	 * 
@@ -30,11 +34,8 @@ class TiiCore extends TiiBase{
 	 * @return 
 	 */
 	public function __set($var, $val){
-		//error_log('__set');
-		//if(in_array($var, $this->_var_permissions['deny_set'])) return;
-		//if (in_array($var, get_class_vars())) $this->{$var} = $val;
-		//else 
-		$this->variables[$var] = $val;
+        if(in_array($var, get_class_vars(__CLASS__))) $this->{$var} = $val;
+		else $this->variables[$var] = $val;
 	}
 
 	/**

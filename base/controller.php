@@ -20,8 +20,6 @@ class TiiController extends TiiCore
     {
         parent::__construct();
 
-        $this->path = $this->GetCreatorsPath();
-
         $this->Template = new TiiTemplate();
     }
 
@@ -29,7 +27,7 @@ class TiiController extends TiiCore
 	 * Set or Return the application path
 	 * which is the absolute path to where the created application's application.php file is residing
 	 *
-	 * @return TiiApplication|String
+	 * @return String
 	 */
 	public function Path($val = null){
 		return $this->GetOrSet(__FUNCTION__, $val, $this->GetCreatorsPath());
