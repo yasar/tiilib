@@ -40,7 +40,7 @@ class TiiModule_Account extends TiiModule{
         
 		if(! is_null($params) && ! empty($params) && is_array($params) ) {
             Tii::Import('helper/array.php');
-            $params = TiiHlpArray::ExtendDeeper($default, $params);
+            $params = TiiA::ExtendDeeper($default, $params);
         }else $params =& $default;
         
         Tii::App()->Template()->AddScript($this->Path().'/templ/login.js');
@@ -52,5 +52,10 @@ class TiiModule_Account extends TiiModule{
             ->GetHTML()
             ;
 	}
+
+    public function IsAccountExist(){
+        return false;
+    }
+
 }
 

@@ -1,5 +1,4 @@
 <?php
-
 class TiiHlpHtml
 {
     const DEFAULT_TAG = 'input';
@@ -41,3 +40,4 @@ class TiiHlpHtml
         }
     }
 }
+class TiiH extends TiiHlpHtml{}

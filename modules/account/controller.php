@@ -13,7 +13,20 @@ class TiiModuleController_Account extends TiiController{
 	}
 
 	public function LoginControl($params=null){
-		return $this->Module->GetLoginForm(isset($params['login_form'])?$params['login_form']:null);
+        switch(TiiR::P('action')){
+            case 'login':
+                if(false === $this->Module->IsAccountExist(TiiR::P('email',''))){
+                    echo 1111;
+                    $this->Errors[] = new TiiError('Account does not exist');
+                }
+                if($this->Errors->count() > 0){
+                    echo $this->Errors->GetMessages();
+                }
+                break;
+                
+            default:
+                return $this->Module->GetLoginForm(isset($params['login_form'])?$params['login_form']:null);
+        }
 	}
 
 }

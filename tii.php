@@ -11,10 +11,14 @@ class Tii {
 		'base/base.php',
 		'base/core.php',
 		'base/controller.php',
-		'base/application.php',
+        'base/application.php',
+		'base/collection.php',
 		'vendor/simple_html_dom.php',
 		'base/template.php',
-		'base/config.php'
+		'base/config.php',
+        'helper/request.php',
+        'base/error.php',
+        'base/collections/errors.php'
 	);
 	
     /**

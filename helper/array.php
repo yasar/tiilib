@@ -53,3 +53,5 @@ class TiiHlpArray
         return $flat; 
     }
 }
+
+class TiiA extends TiiHlpArray{}
