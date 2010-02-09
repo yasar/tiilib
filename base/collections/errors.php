@@ -39,7 +39,6 @@ class TiiErrors extends TiiCollection{
     }
     
     public function GetMessages(){
-        foreach($this as $e) $out[]=$e;
-        return '<ol><li>'.implode('</li><li>',$out).'</li></ol>';
+        return '<ol><li>'.implode('</li><li>',$this->GetCollection()).'</li></ol>';
     }
 }

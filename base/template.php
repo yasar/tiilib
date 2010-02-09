@@ -265,7 +265,7 @@ class TiiTemplate extends TiiCore {
         else{
             $this->DOM->root->prepare_innertext();
             $this->ParseScripts()->ParseStyles();
-            $this->html = $this->DOM->root->innertext();
+            $this->html = $this->DOM->root->innertext(false);
         }
         //$this->html = str_replace(chr(10), '', $this->html);
         

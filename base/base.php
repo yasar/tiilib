@@ -14,4 +14,21 @@ abstract class TiiBase {
         return $this->id;
     }
 
+
+	/**
+	 * LoadFromArray()
+	 * 
+	 * Will load the class properties from an associative array
+	 * 
+	 * @param object $array
+	 * @return {TCore}
+	 */
+	protected function LoadFromArray(Array $array){
+		$vars = array_keys(get_class_vars(get_class($this)));
+		foreach($vars as $var){
+			isset($array[$var])
+			&& $this->{$var} = $array[$var];
+		}
+        return $this;
+	}
 }

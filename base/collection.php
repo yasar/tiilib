@@ -9,6 +9,10 @@ class TiiCollection implements ArrayAccess, Iterator, Countable {
         $this->container = array();
     }
     
+    protected function GetCollection(){
+        return $this->container;
+    }
+    
     public function offsetSet($offset,$value) {
         if ($offset == "") {
             $this->container[] = $value;

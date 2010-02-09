@@ -1,4 +1,6 @@
 <?php
+
+
 class TiiHlpRequest{
     public static function P($key,$default=null){return self::Post($key,$default);}
     public static function Post($key,$default=null){return self::_($key,$default,$_POST);}

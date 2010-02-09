@@ -94,20 +94,4 @@ abstract class TiiCore extends TiiBase{
 
 	}
 	
-	/**
-	 * LoadFromArray()
-	 * 
-	 * Will load the class properties from an associative array
-	 * 
-	 * @param object $array
-	 * @return {TCore}
-	 */
-	protected function LoadFromArray(Array $array){
-		$vars = array_keys(get_class_vars(get_class($this)));
-		foreach($vars as $var){
-			isset($arr[$var])
-			&& $this->{$var} = $arr[$var];
-		}
-        return $this;
-	}
 }

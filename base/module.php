@@ -8,6 +8,7 @@ class TiiModule extends TiiCore{
     
     //protected $Controller;
 
+    protected $DB;
 
 
 	public function __construct(){
@@ -17,6 +18,8 @@ class TiiModule extends TiiCore{
 
 		$this->Config = new TiiConfig();
 		$this->LoadConfig();
+		
+		$this->DB =& Tii::DB();
 	}
 
 	/**

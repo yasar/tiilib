@@ -18,7 +18,8 @@ class Tii {
 		'base/config.php',
         'helper/request.php',
         'base/error.php',
-        'base/collections/errors.php'
+        'base/collections/errors.php',
+        'base/db.php'
 	);
 	
     /**
@@ -48,7 +49,16 @@ class Tii {
      */
     static private $_apps;
     
+    static private $_DB;
+    
     static public $debug = false;
+    
+    /**
+    * Holds the authenticated Account
+    * 
+    * @var TiiModel_Account
+    */
+    static public $ActiveAccount;
     
     static public function Init($config_file = null, $validate=false) {
         self::$_start_time = microtime(true);
@@ -64,6 +74,8 @@ class Tii {
 		if (! is_null($config_file)) self::LoadConfig($config_file);
 		
 		//if (self::Config('debug')))
+		
+		self::$_DB = new TiiDB();
     }
 	
 	static public function LoadConfig($config_file){
@@ -152,6 +164,10 @@ class Tii {
         return self::$_apps[$name];
     }
 	
+	static public function &DB(){
+		return self::$_DB;
+	}
+	
 	/**
 	 * Takes at least one parameter which is the string to be displayed.
 	 * if more parameters are passed in, sprintf will be used to format the string accordingly
@@ -169,5 +185,22 @@ class Tii {
 	static public function ExceptionHandler(Exception $e){
 		echo Tii::Out(file_get_contents(TII_PATH_FRAMEWORK.'/base/resources/exception.html'), 
 			get_class($e), $e->getCode(), htmlentities($e->getMessage()), $e->getFile(), $e->getLine(), $e->getTraceAsString());
+	}
+	
+	
+	/**
+	* put your comment there...
+	* 
+	* @param string $key
+	* @param mixed $value
+	* @return Tii|boolean
+	*/
+	static public function Session($key, $value=null){
+		if(is_null($value)) {
+			if(! isset($_SESSION[$key])) return false;
+			else return $_SESSION[$key];
+		}
+		$_SESSION[$key] = $value;
+		return self;
 	}
 }
