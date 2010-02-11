@@ -22,13 +22,21 @@ class TiiController extends TiiCore
     */
     protected $Errors;
     
-    public function __construct()
+    protected $action;
+    
+    protected $params;
+    
+    public function __construct($params)
     {
         parent::__construct();
 
         $this->Template = new TiiTemplate();
         
         $this->Errors = new TiiErrors();
+        
+        $this->action = TiiR::Any('action');
+        
+        $this->params = $params;
     }
 
 	/**
@@ -45,6 +53,11 @@ class TiiController extends TiiCore
     {
         if(! is_null($template_file)) $this->Template->SetTemplate($template_file, $absolute_path);
         return $this->Template;
+    }
+    
+    public function GetParam($key){
+		if(isset($this->params[$key])) return $this->params[$key];
+		return null;
     }
     
     /**

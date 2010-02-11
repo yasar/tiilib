@@ -1,10 +1,17 @@
 <?php
 class TiiModule_Account extends TiiModule{
+	/**
+	* put your comment there...
+	* 
+	* @var TiiController
+	*/
+	protected $Controller;
+	
 	public function __construct(){
 		parent::__construct();
 	}
 
-	public function GetLoginForm($params = null){
+	public function GetLoginForm(){
         $default = array(
             'holder'            => array(
                 'id'            =>'LoginForm_Holder'
@@ -38,29 +45,30 @@ class TiiModule_Account extends TiiModule{
         );
         
         
-		if(! is_null($params) && ! empty($params) && is_array($params) ) {
+		//if(! is_null($params) && ! empty($params) && is_array($params) ) {
+		if(($params = $this->Controller()->GetParam('login_form')) !== null){
             Tii::Import('helper/array.php');
             $params = TiiA::ExtendDeeper($default, $params);
         }else $params =& $default;
         
-        Tii::App()->Template()->AddScript($this->Path().'/templ/login.js');
-        Tii::App()->Template()->AddStyle($this->Path().'/templ/login.css');
+        Tii::App()->Template()->AddScript($this->Path().'/views/login.js');
+        Tii::App()->Template()->AddStyle($this->Path().'/views/login.css');
         
 		return $this->Controller()
-            ->Template($this->path.'/templ/login.html', $absolute_path=true)
+            ->Template($this->path.'/views/login.html', $absolute_path=true)
             ->ProcessModuleTemplate($params)
             ->GetHTML()
             ;
 	}
 
     public function IsAccountExist($email){
-        $sql="select count(*) as total from account where email='$email'";
+        $sql="select count(*) as `total` from `account` where `email`='$email'";
         $row=$this->DB->Query($sql,true);
         return intval($row['total']) > 0;
     }
 
     public function Authenticate($email,$password){
-		$row=$this->DB->Query("select * from account where email='$email' and password='$password'");
+		$row=$this->DB->Query("select * from `account` where `email`='$email' and `password`='$password'");
 		if(empty($row)) return false;
 		return $row;
     }

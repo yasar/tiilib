@@ -33,7 +33,7 @@ abstract class TiiCore extends TiiBase{
 	 * @param object $val
 	 * @return 
 	 */
-	public function __set($var, $val){
+	public function x__set($var, $val){
         if(in_array($var, get_class_vars(__CLASS__))) $this->{$var} = $val;
 		else $this->variables[$var] = $val;
 	}
@@ -48,7 +48,7 @@ abstract class TiiCore extends TiiBase{
 	 * @param object $var
 	 * @return 
 	 */
-	public function __get($var){
+	public function x__get($var){
 		return
 			isset($this->{$var})
 			? $this->variables[$var]
@@ -66,8 +66,10 @@ abstract class TiiCore extends TiiBase{
 	 * @param object $var
 	 * @return 
 	 */
-	public function __isset($var){
-		return key_exists($var, $this->variables);
+	public function x__isset($var){
+		return isset($this->{$var}) 
+			? true 
+			: key_exists($var, $this->variables);
 	}
 	
 	/**

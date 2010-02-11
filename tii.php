@@ -7,7 +7,7 @@ if (!defined('TII_PATH_FRAMEWORK'))
 
 class Tii {
 	static private $_imports = array(
-		'base/globals.php',
+		'globals.php',
 		'base/base.php',
 		'base/core.php',
 		'base/controller.php',
@@ -19,7 +19,8 @@ class Tii {
         'helper/request.php',
         'base/error.php',
         'base/collections/errors.php',
-        'base/db.php'
+        'base/db.php',
+        'helper/common.php'
 	);
 	
     /**

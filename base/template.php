@@ -88,7 +88,7 @@ class TiiTemplate extends TiiCore {
      * @return TiiTemplate
      */
     public function SetTemplate($s, $absolute_path = false) {
-        $this->template_file = $absolute_path ? $s : Tii::App()->Path() . '/templ/' . $s;
+        $this->template_file = $absolute_path ? $s : Tii::App()->Path() ._.'templ'._. $s;
         $this->LoadDOM();
         return $this;
     }
@@ -177,16 +177,17 @@ class TiiTemplate extends TiiCore {
 					case 'Module':
 						//base module is required in any case
 						Tii::Import('base/module.php');
-						// get all the attributes of the element: array(type,clas,...)
+						
+						// get all the attributes of the element: array(type,name,controller,...)
 						// then extract them to local variables
 						extract($_element->getAllAttributes());
 
 						// fix the class name
-						$class_name = 'TiiModuleController_'.$class;
+						$class_name = 'TiiModuleController_'.ucwords($controller);
 
 						// include the controller file 
                         // which includes the class_name definition
-						Tii::Import('modules/'.$class.'/controller.php');
+						Tii::Import('modules/'.$name.'/controllers/'.$controller.'.php');
 						break;
 
 						
@@ -199,9 +200,7 @@ class TiiTemplate extends TiiCore {
 				$_RClass = new ReflectionClass($class_name);
 
 				// check if the required method is available in the class
-				if($_RClass->hasMethod($method)) {
-					// create a new instance of the module class
-					$_CLASS = $_RClass->newInstance();
+				if($_RClass->hasMethod(tii_setnot($method,TII_MODULE_CONTROLLER_DEFAULT_METHOD))) {
 
 					// check is attribute:params is supplied
 					$params = $_element->getAttribute('params');
@@ -216,15 +215,16 @@ class TiiTemplate extends TiiCore {
 						$params = null;
 					}
                     
+					// create a new instance of the module class
+					$_CLASS = $_RClass->newInstance($params);
+					
 					// invoke the requested method along with the parameters supplied
-					$_return = $_CLASS->{$method}($params);
-                    //echo '<hr />'.'='.Tii::App()->Template()->ID().'<hr/>';
-                    //var_dump(Tii::App()->Template()->scripts);
-                    //throw new Exception('qqq');
+					$_return = $_CLASS->{$method}();
                     
 					// replace the element with method's return value
 					$_element->outertext=$_return;
-				}else{
+				}
+				else{
 					// if the method is not found, throw an exception
 					throw new Exception('Requested method is not defined: '.$class_name.'->'.$method.'()');
 				}
