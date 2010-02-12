@@ -13,63 +13,9 @@ abstract class TiiCore extends TiiBase{
     //protected $path;
     abstract public function Path();
     
-	public function __construct(){
-		parent::__construct();
-	}
-
 	protected function GetCreatorsPath($level=1){
 		$trace = debug_backtrace();
-		$arr = explode('/',dirname($trace[$level]['file']));
-		$arr = array_reverse($arr);
-		return array_shift($arr);
-	}
-    
-	/**
-	 * Magic function, Setter()
-	 * 
-	 * Will set the variable as an associated key in the variables array 
-	 * 
-	 * @param object $var
-	 * @param object $val
-	 * @return 
-	 */
-	public function x__set($var, $val){
-        if(in_array($var, get_class_vars(__CLASS__))) $this->{$var} = $val;
-		else $this->variables[$var] = $val;
-	}
-
-	/**
-	 * Magic function, Getter()
-	 * 
-	 * Will check if the requested variable is set in the variables array,
-	 * if set, will return it,
-	 * otherwise will return NULL
-	 * 
-	 * @param object $var
-	 * @return 
-	 */
-	public function x__get($var){
-		return
-			isset($this->{$var})
-			? $this->variables[$var]
-			: null;
-		//return in_array($var, get_class_vars(__CLASS__)) ? $this->{$var} : isset($this->variables[$var]) ? $this->variables[$var] : null;
-	}
-	
-	/**
-	 * Magic function, IsSet()
-	 * 
-	 * Will look for the variable as a key in the associative array.
-	 * If found, will return TRUE
-	 * otherwise will return FALSE
-	 *  
-	 * @param object $var
-	 * @return 
-	 */
-	public function x__isset($var){
-		return isset($this->{$var}) 
-			? true 
-			: key_exists($var, $this->variables);
+		return dirname($trace[$level]['file']);
 	}
 	
 	/**
@@ -93,7 +39,6 @@ abstract class TiiCore extends TiiBase{
 		}
 		$this->{$var} = $val;
 		return $this;
-
 	}
 	
 }

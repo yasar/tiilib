@@ -25,32 +25,12 @@ class TiiModuleController_Login extends TiiController{
 	
 	public function Main($params=null){
 		switch(TiiHlpRequest::Post('action')){
-			
+			case 'login':
+				if ($this->Login()) return;
+				break;
 		}
+		
 		return $this->GetLoginForm();
-		/*
-        switch(TiiR::P('action')){
-            case 'login':
-                if(false === $this->Module->IsAccountExist(TiiR::P('email'))){
-                    $this->Errors[] = new TiiError('Account does not exist');
-                }
-                else {
-					 $account = $this->Module->Authenticate(TiiR::P('email'),TiiR::P('password'));
-					 if ($account === false){
-						 $this->Errors[] = new TiiError('Email address or password is invalid');
-					 }else{
-					 	 $this->Account = new TiiModel_Account();
-						 Tii::Session(TII_SK_ACTIVE_ACCOUNT, $this->Account->LoadFromArray($account));
-					 }
-                }
-                if($this->Errors->count() > 0){
-                    echo $this->Errors->GetMessages();
-                }
-                break;
-                
-            default: */
-                //return $this->Module->GetLoginForm(isset($params['login_form'])?$params['login_form']:null);
-        //}
 	}
 	
 	public function GetLoginForm(){
@@ -71,9 +51,8 @@ class TiiModuleController_Login extends TiiController{
 				 Tii::Session(TII_SK_ACTIVE_ACCOUNT, $this->Account->LoadFromArray($account));
 			 }
         }
-        if($this->Errors->count() > 0){
-            echo $this->Errors->GetMessages();
-        }
+        if($this->Errors->count() > 0) return false;
+        return true;
 	}
 
 }

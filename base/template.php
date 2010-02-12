@@ -48,7 +48,9 @@ class TiiTemplate extends TiiCore {
      * @return TiiTemplate
      */ 
 	public function AddScript($file, $idx=999){
-        $file = realpath($file);
+		//if (_ !== '/') $file = str_replace('/',_,$file);
+		
+        //$file = realpath($file);
         
 		if ($this->IsIncluded($file)) return $this;
 		
@@ -187,7 +189,7 @@ class TiiTemplate extends TiiCore {
 
 						// include the controller file 
                         // which includes the class_name definition
-						Tii::Import('modules/'.$name.'/controllers/'.$controller.'.php');
+						Tii::Import("modules/$name/controllers/$controller.php");
 						break;
 
 						

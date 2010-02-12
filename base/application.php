@@ -4,7 +4,7 @@ class TiiApplication extends TiiCore {
 	private $name;
 
 	// holds the application path
-	private $path;
+	private $_path;
 
     /**
      * @var TiiTemplate
@@ -15,20 +15,30 @@ class TiiApplication extends TiiCore {
 	 * @var string
 	 */
     protected $template_file;
+    
+    /**
+    * Holds the last module created/accessed
+    * 
+    * @var TiiModule
+    */
+    private $_Module;
 
     public function __construct() {
         parent::__construct();
         
-        Tii::LoadConfig($this->Path().'/config.json');
+        $this->_path = $this->GetCreatorsPath();
+        
+        $config_file = $this->_path._.'config.json';
+        Tii::LoadConfig($config_file);
 
-		$this->template_file = Tii::Config($this->Name() . '/template');
+		$this->template_file = Tii::Config($this->Name().'/template');
     }
 	
 	/**
 	 * @return TiiApplication|String
 	 */ 	 		
     public function Name($val = null) {
-    	return $this->GetOrSet(__FUNCTION__, $val, pathinfo($this->Path(), PATHINFO_BASENAME));
+    	return $this->GetOrSet(__FUNCTION__, $val, pathinfo($this->_path, PATHINFO_BASENAME));
     }
 
 	/**
@@ -37,9 +47,14 @@ class TiiApplication extends TiiCore {
 	 *
 	 * @return TiiApplication|String
 	 */
-	public function Path($val = null){
-		return $this->GetOrSet(__FUNCTION__, $val, $this->GetCreatorsPath(2));
+	public function Path(){
+		return $this->_path;
+		//return $this->GetOrSet(__FUNCTION__, $val, $this->GetCreatorsPath(2));
 	}
+	
+    public function Module($val = null) {
+    	return $this->GetOrSet('_'.__FUNCTION__, $val);
+    }
 
 	/**
 	 *

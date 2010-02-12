@@ -5,10 +5,11 @@ class TiiModule_Account extends TiiModule{
 	* 
 	* @var TiiController
 	*/
-	protected $Controller;
+	//protected $Controller;
 	
 	public function __construct(){
 		parent::__construct();
+		
 	}
 
 	public function GetLoginForm(){
@@ -63,12 +64,12 @@ class TiiModule_Account extends TiiModule{
 
     public function IsAccountExist($email){
         $sql="select count(*) as `total` from `account` where `email`='$email'";
-        $row=$this->DB->Query($sql,true);
+        $row=$this->DB()->Query($sql,true);
         return intval($row['total']) > 0;
     }
 
     public function Authenticate($email,$password){
-		$row=$this->DB->Query("select * from `account` where `email`='$email' and `password`='$password'");
+		$row=$this->DB()->Query("select * from `account` where `email`='$email' and `password`='$password'");
 		if(empty($row)) return false;
 		return $row;
     }

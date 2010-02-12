@@ -1,5 +1,5 @@
 <?php
-define('_', DIRECTORY_SEPARATOR);
+define('_', DIRECTORY_SEPARATOR); $_=_;
 define('TII_CONFIG_FILE_TYPE_INI',0);
 define('TII_CONFIG_FILE_TYPE_JSON',1);
 

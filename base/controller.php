@@ -26,6 +26,8 @@ class TiiController extends TiiCore
     
     protected $params;
     
+    private $_path;
+    
     public function __construct($params)
     {
         parent::__construct();
@@ -46,7 +48,7 @@ class TiiController extends TiiCore
 	 * @return String
 	 */
 	public function Path($val = null){
-		return $this->GetOrSet(__FUNCTION__, $val, $this->GetCreatorsPath());
+		return $this->GetOrSet('_'.strtolower(__FUNCTION__), $val, $this->GetCreatorsPath());
 	}
 	
     public function Template($template_file=null, $absolute_path = false)
@@ -60,31 +62,4 @@ class TiiController extends TiiCore
 		return null;
     }
     
-    /**
-    * put your comment there...
-    * 
-    * @param TiiError $error
-    * @returns TiiController
-    */
-    /*
-    protected function AddError(TiiError $error){
-        $this->errors[]=$error;
-        return $this;
-    }
-    
-    protected function HasError(){
-        return count($this->errors) > 0;
-    }
-    
-    /**
-    * Clear the stored errors previously generated
-    * 
-    * @returns TiiController
-    */
-    /*
-    protected function ClearErrors(){
-        $this->errors = array();
-        return $this;
-    } 
-    */
 }

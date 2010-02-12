@@ -4,11 +4,14 @@ class TiiModule extends TiiCore{
 	/**
 	 * @var TiiConfig
 	 */
-	protected $Config;
+	private $_Config=null;
     
-    //protected $Controller;
+    private $_Controller=null;
 
-    protected $DB;
+    private $_DB;
+    
+    protected $path;
+    
 
 
 	public function __construct(){
@@ -16,10 +19,11 @@ class TiiModule extends TiiCore{
 
 		$this->path = $this->GetCreatorsPath();
 
-		$this->Config = new TiiConfig();
 		$this->LoadConfig();
 		
-		$this->DB =& Tii::DB();
+		$this->_DB =& Tii::DB();
+		
+		Tii::App()->Module(& $this);
 	}
 
 	/**
@@ -28,16 +32,31 @@ class TiiModule extends TiiCore{
 	 *
 	 * @return String
 	 */
-	public function Path($val = null){
+	public function x__Path($val = null){
 		return $this->GetOrSet(__FUNCTION__, $val, $this->GetCreatorsPath());
 	}
+	
+	public function Path(){return $this->path;}
+	
+	/**
+	* put your comment there...
+	* @return TiiDB
+	*/
+	public function DB(){return $this->_DB;}
 
 	private function LoadConfig(){
-		$config_file = $this->path . '/config.json';
-		if(file_exists($config_file)) $this->Config->LoadFromFile($config_file);
+		$config_file = $this->path._.'config.json';
+		if(file_exists($config_file)) {
+			$this->_Config = new TiiConfig();
+			$this->_Config->LoadFromFile($config_file);
+		}
+	}
+	
+	protected function Config(){
+		
 	}
     
     public function Controller(TiiController $val=null){
-        return $this->GetOrSet(__FUNCTION__, $val);
+        return $this->GetOrSet('_'.__FUNCTION__, $val);
     }
 }

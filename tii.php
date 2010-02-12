@@ -7,7 +7,6 @@ if (!defined('TII_PATH_FRAMEWORK'))
 
 class Tii {
 	static private $_imports = array(
-		'globals.php',
 		'base/base.php',
 		'base/core.php',
 		'base/controller.php',
@@ -78,6 +77,11 @@ class Tii {
 		
 		self::$_DB = new TiiDB();
     }
+    
+    static public function Finish(){
+		$end_time = microtime(true);
+		return $end_time - self::$_start_time;
+    }
 	
 	static public function LoadConfig($config_file){
 		self::$_Config->LoadFromFile($config_file);
@@ -97,10 +101,13 @@ class Tii {
      * @return Tii
      */
     static public function Import($path) {
+    	// fix path seperator
+    	if (_ !== '/') $path = str_replace('/',_,$path);
+    	
     	static $imports = array();
 		if (in_array($path, $imports)) return;
 		
-        $filename = TII_PATH_FRAMEWORK.DIRECTORY_SEPARATOR.$path;
+        $filename = TII_PATH_FRAMEWORK._.$path;
         if (file_exists($filename)){
             include_once $filename;
 			$imports[] = $path;
@@ -115,7 +122,7 @@ class Tii {
      * @return TiiApplication
      */
     static public function CreateApp($app_name, $init=true) {
-    	$path = TII_PATH_ROOT.'/apps/'.strtolower($app_name).'/application.php';
+    	$path = TII_PATH_ROOT._.'apps'._.strtolower($app_name)._.'application.php';
 		if (! file_exists($path)) throw new Exception (Tii::Out('Application "%s" could not be found at: %s', $app_name, $path));
     	
 		include $path;
@@ -184,7 +191,7 @@ class Tii {
 	}
 	
 	static public function ExceptionHandler(Exception $e){
-		echo Tii::Out(file_get_contents(TII_PATH_FRAMEWORK.'/base/resources/exception.html'), 
+		echo Tii::Out(file_get_contents(TII_PATH_FRAMEWORK._.'base'._.'resources'._.'exception.html'), 
 			get_class($e), $e->getCode(), htmlentities($e->getMessage()), $e->getFile(), $e->getLine(), $e->getTraceAsString());
 	}
 	
