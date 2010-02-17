@@ -62,4 +62,10 @@ class TiiController extends TiiCore
 		return null;
     }
     
+    /**
+    * returns the error collection object
+    * 
+    * @return TiiErrors
+    */
+    public function Errors(){return $this->Errors;}
 }

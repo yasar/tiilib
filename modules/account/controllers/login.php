@@ -21,12 +21,14 @@ class TiiModuleController_Login extends TiiController{
         $this->Account = new TiiModel_Account();
         $this->Module = new TiiModule_Account();
         $this->Module->Controller(& $this);
+        $this->Template->Controller(& $this);
 	}
 	
 	public function Main($params=null){
 		switch(TiiHlpRequest::Post('action')){
 			case 'login':
-				if ($this->Login()) return;
+				if ($this->Login()) return true;
+				Tii::App()->Template()->Errors->Import($this->Errors);
 				break;
 		}
 		

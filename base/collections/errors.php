@@ -18,6 +18,10 @@ class TiiErrors extends TiiCollection{
     public function ClearErrors(){
         $this->ClearCollection();
         return $this;
+    }
+    
+    public function Import(TiiErrors $Errors){
+		foreach($Errors as $Error) $this->AddError($Error);
     }   
     
     /**

@@ -16,6 +16,21 @@ class TiiTemplate extends TiiCore {
     
     private $html;
     
+    /**
+    * holds the error object
+    * 
+    * @var TiiErrors
+    */
+    public $Errors;
+    
+    /**
+    * holds the parent controller
+    * 
+    * @var TiiController
+    */
+    private $Controller;
+    static private $_Controller;
+    
     public $scripts=array();
     private $styles=array();
     private $includes=array();
@@ -26,10 +41,24 @@ class TiiTemplate extends TiiCore {
        // echo 'Template created : ',$this->ID(),'<br />';
         if (! empty($template_file))
             $this->SetTemplate($template_file);
+        
+        $this->Errors = new TiiErrors();
     }
     
     public function __destruct() {
         unset($this->DOM);
+    }
+    
+    /**
+    * Set or return the parent controller
+    * 
+    * @param TiiController $Controller
+    * @return TiiTemplate
+    */
+    public function Controller(TiiController $Controller=null){
+		if (is_null($Controller)) return $this->Controller;
+		$this->Controller = $Controller;
+		return $this;
     }
     
 	/**
@@ -110,7 +139,8 @@ class TiiTemplate extends TiiCore {
         //$this->DOM = file_get_html($this->template_file);
 	    $this->DOM = new simple_html_dom($this->template_file);
 
-	   // $this->ProcessTiiTags();
+	    // $this->ProcessTiiTags();
+	    self::$_Controller = $this->Controller;
 	    $this->DOM->set_callback(array('TiiTemplate','ProcessTiiTags'));
     }
     
@@ -166,7 +196,7 @@ class TiiTemplate extends TiiCore {
         return $this;
     }
     
-	public static function ProcessTiiTags(simple_html_dom_node $_element){
+	public static function ProcessTiiTags(simple_html_dom_node $_element, $Controller){
 		// all the variables defined in this function are starting with underscore (_)
 		// this is to make sure no any defined variable will be override by the extracted variables from the attributes.
 		
@@ -190,6 +220,12 @@ class TiiTemplate extends TiiCore {
 						// include the controller file 
                         // which includes the class_name definition
 						Tii::Import("modules/$name/controllers/$controller.php");
+						break;
+						
+					case 'ErrorHolder':
+						if ( self::$_Controller->Errors()->HasError()){
+							echo self::$_Controller->Errors()->GetMessages();
+						}
 						break;
 
 						
