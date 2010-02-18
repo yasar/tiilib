@@ -224,7 +224,7 @@ class TiiTemplate extends TiiCore {
 						
 					case 'ErrorHolder':
 						if ( self::$_Controller->Errors()->HasError()){
-							echo self::$_Controller->Errors()->GetMessages();
+							$_element->outertext = self::$_Controller->Errors()->GetMessages();
 						}
 						break;
 
@@ -234,39 +234,41 @@ class TiiTemplate extends TiiCore {
 					default: return;
 				}
 
-				// create a reflection class for the module class
-				$_RClass = new ReflectionClass($class_name);
+				
+				if(! empty($class_name)){
+					// create a reflection class for the module class
+					$_RClass = new ReflectionClass($class_name);
 
-				// check if the required method is available in the class
-				if($_RClass->hasMethod(tii_setnot($method,TII_MODULE_CONTROLLER_DEFAULT_METHOD))) {
+					// check if the required method is available in the class
+					if($_RClass->hasMethod(tii_setnot($method,TII_MODULE_CONTROLLER_DEFAULT_METHOD))) {
 
-					// check is attribute:params is supplied
-					$params = $_element->getAttribute('params');
+						// check is attribute:params is supplied
+						$params = $_element->getAttribute('params');
 
-					if($params !== false) {
-						// make sure the supplied params which is in json format,
-						// has the keys double quoted.
-						$params = json_decode(str_replace('\'','"',$params), true);
+						if($params !== false) {
+							// make sure the supplied params which is in json format,
+							// has the keys double quoted.
+							$params = json_decode(str_replace('\'','"',$params), true);
+						}
+						else {
+							// if no params is supplied, then set it to an empty array.
+							$params = null;
+						}
+	                    
+						// create a new instance of the module class
+						$_CLASS = $_RClass->newInstance($params);
+						
+						// invoke the requested method along with the parameters supplied
+						$_return = $_CLASS->{$method}();
+	                    
+						// replace the element with method's return value
+						$_element->outertext=$_return;
 					}
-					else {
-						// if no params is supplied, then set it to an empty array.
-						$params = null;
+					else{
+						// if the method is not found, throw an exception
+						throw new Exception('Requested method is not defined: '.$class_name.'->'.$method.'()');
 					}
-                    
-					// create a new instance of the module class
-					$_CLASS = $_RClass->newInstance($params);
-					
-					// invoke the requested method along with the parameters supplied
-					$_return = $_CLASS->{$method}();
-                    
-					// replace the element with method's return value
-					$_element->outertext=$_return;
 				}
-				else{
-					// if the method is not found, throw an exception
-					throw new Exception('Requested method is not defined: '.$class_name.'->'.$method.'()');
-				}
-
 				break;
 		}
 	}

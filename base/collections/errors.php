@@ -43,6 +43,6 @@ class TiiErrors extends TiiCollection{
     }
     
     public function GetMessages(){
-        return '<ol><li>'.implode('</li><li>',$this->GetCollection()).'</li></ol>';
+        return '<ul class="errors"><li>'.implode('</li><li>',$this->GetCollection()).'</li></ul>';
     }
 }
