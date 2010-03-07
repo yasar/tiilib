@@ -3,7 +3,7 @@ class TiiHlpHtml
 {
     const DEFAULT_TAG = 'input';
 
-    public static function GetTag($attributes, $tag = null)
+    static public function GetTag($attributes, $tag = null)
     {
         $_attributes = array();
 		

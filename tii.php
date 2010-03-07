@@ -12,7 +12,7 @@ class Tii {
 		'base/controller.php',
         'base/application.php',
 		'base/collection.php',
-		'vendor/simple_html_dom.php',
+		'vendor/php/simple_html_dom.php',
 		'base/template.php',
 		'base/config.php',
         'helper/request.php',

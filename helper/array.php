@@ -7,7 +7,7 @@ class TiiHlpArray
      *
      * @return Array Extended array
      */
-    public static function Extend()
+    static public function Extend()
     {
         $args = func_get_args();
         $extended = array();
@@ -21,7 +21,7 @@ class TiiHlpArray
         return $extended;
     }
 
-    public static function ExtendDeeper($array1, $array2)
+    static public function ExtendDeeper($array1, $array2)
     {
         $merged = $array1;
 
@@ -41,7 +41,7 @@ class TiiHlpArray
     /**
      * takes a multi-dimensional array, and flattens into a zero indexed array.
      */
-    public static function Flatten($array, $flat = false){
+    static public function Flatten($array, $flat = false){
         if (!is_array($array) || empty($array)) return ''; 
         if (empty($flat)) $flat = array(); 
             

@@ -1,0 +1,6 @@
+{
+	"admin" : {
+		"default_method"	: "index",
+		"template"			: "default.html"
+	}
+}

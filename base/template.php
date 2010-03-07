@@ -34,6 +34,7 @@ class TiiTemplate extends TiiCore {
     public $scripts=array();
     private $styles=array();
     private $includes=array();
+    private $codes=array();
 
     public function __construct($template_file = null) {
 	    //$this->_var_permissions['deny_set'] = array('DOM');
@@ -109,6 +110,26 @@ class TiiTemplate extends TiiCore {
         
         return $this;
 	}
+    
+    public function Import($name){
+        switch($name){
+            case 'jquery':
+                $this->AddScript(TII_PATH_FRAMEWORK.'/vendor/js/jquery-1.4.1.min.js', 0);
+                break;
+                
+            case 'mbmenu':
+                $this->Import('jquery');
+                $this->AddStyle(TII_PATH_FRAMEWORK.'/vendor/mbmenu/menu.css');
+                $this->AddStyle(TII_PATH_FRAMEWORK.'/vendor/mbmenu/mbMenu.min.js');
+                break;
+        }
+        return $this;
+    }
+    
+    public function AddScriptCode($code, $idx=999){
+        $this->codes[$idx][]=$code;
+        return $this;
+    }
 	
 	public function IsIncluded($file){
 		return in_array($file, $this->includes);
@@ -196,7 +217,7 @@ class TiiTemplate extends TiiCore {
         return $this;
     }
     
-	public static function ProcessTiiTags(simple_html_dom_node $_element, $Controller){
+	static public function ProcessTiiTags(simple_html_dom_node $_element, $Controller=null){
 		// all the variables defined in this function are starting with underscore (_)
 		// this is to make sure no any defined variable will be override by the extracted variables from the attributes.
 		
@@ -205,8 +226,8 @@ class TiiTemplate extends TiiCore {
 			// eg: <tii type="Module" class="Account" method="LoginControl" params="" base_path="/tiilib/modules" />
 			case 'tii':
 				// check the attribute:type
-				switch($_element->getAttribute('type')){
-					case 'Module':
+				switch(strtolower($_element->getAttribute('type'))){
+					case 'module':
 						//base module is required in any case
 						Tii::Import('base/module.php');
 						
@@ -221,8 +242,15 @@ class TiiTemplate extends TiiCore {
                         // which includes the class_name definition
 						Tii::Import("modules/$name/controllers/$controller.php");
 						break;
-						
-					case 'ErrorHolder':
+					
+                    case 'plugin':
+                        extract($_element->getAllAttributes());
+                        $func_name = ucwords($module).'Plugin_'.ucwords($name);
+                        Tii::Import("modules/$module/plugins/$name.php");
+                        $_element->outertext = $func_name($params);
+                        break;
+                        	
+					case 'errorholder':
 						if ( self::$_Controller->Errors()->HasError()){
 							$_element->outertext = self::$_Controller->Errors()->GetMessages();
 						}
@@ -304,7 +332,7 @@ class TiiTemplate extends TiiCore {
             $this->html = $this->DOM->find('[id='.$node_selector.']', 0)->outertext();
         else{
             $this->DOM->root->prepare_innertext();
-            $this->ParseScripts()->ParseStyles();
+            $this->ParseScripts()->ParseStyles()->ParseScriptCodes();
             $this->html = $this->DOM->root->innertext(false);
         }
         //$this->html = str_replace(chr(10), '', $this->html);
@@ -324,13 +352,18 @@ class TiiTemplate extends TiiCore {
         return $this;
     }
     
+    private function ParseScriptCodes(){
+        if(! empty($this->codes))
+        $this->AddToHead($this->codes,'<script type="text/javascript">$(function(){%s});</script>');
+    }
+    
     /**
      * @return TiiTemplate
      */ 
     private function ParseStyles(){
         if(($filename = $this->ParseFiles($this->styles,'css')) !== false){
             // add this cache file to the template
-            $this->AddToHead(TII_URL_ROOT.$filename,'<link href="%s" rel="stylesheet" type="text/css">');
+            $this->AddToHead(TII_URL_ROOT.$filename,'<link href="%s" rel="stylesheet" type="text/css" />');
         }
         
         return $this;
@@ -369,14 +402,17 @@ class TiiTemplate extends TiiCore {
     }
     
     private function AddToHead($html, $format=null){
-        static $head;
-        
+        //echo $html;
+        //static $head;
+        //$this->DOM->
         if (!isset($head)) $head = $this->DOM->find('head', 0);
         
         if(! is_null($format) && ! empty($format)) $html = Tii::Out($format,$html).chr(10);
-        
-        $head->innertext = $head->innertext() . $html;
-        
+        //$head->prepare_innertext();
+        $head->innertext = $head->innertext . $html;
+        //$head->appendData($html);
+        //$this->DOM->find('head', 0)->innertext=$this->DOM->find('head', 0)->innertext().$html;
+        //error_log($head->innertext);
         return $this;
     }
     

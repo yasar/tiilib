@@ -176,8 +176,8 @@ class TiiMenu implements IteratorAggregate{
     //private $count=0;
 	private $last_item_name;
 	private $is_current = false;
-	//static private $current_item_class = 'on2';
-	static private $ctr=0;
+	//private $current_item_class = 'on2';
+	private $ctr=0;
 	private $is_built = false;
 	/**
 	 * @var TiiMenuItem
@@ -191,9 +191,9 @@ class TiiMenu implements IteratorAggregate{
     */
     private $html;
 	
-	static private $level=1;
+	private $level=1;
 
-    static private $last_menu_accessed;
+    private $last_menu_accessed;
     
 	/**
 	 * @param TiiMenu $menu
