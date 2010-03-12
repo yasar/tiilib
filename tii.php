@@ -1,4 +1,4 @@
-<?php 
+<?php /**/
 if (!defined('TII_PATH_ROOT'))
     throw new Exception('TII_PATH_ROOT constant is not defined');
     
