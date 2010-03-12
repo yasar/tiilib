@@ -7,12 +7,14 @@ if (!defined('TII_PATH_FRAMEWORK'))
 
 class Tii {
 	static private $_imports = array(
-		'base/base.php',
+		'base/interfaces.php',
+        'base/base.php',
 		'base/core.php',
 		'base/controller.php',
         'base/application.php',
 		'base/collection.php',
 		'vendor/php/simple_html_dom.php',
+        //'base/dom.php',
 		'base/template.php',
 		'base/config.php',
         'helper/request.php',

@@ -31,7 +31,10 @@ class TiiTemplate extends TiiCore {
     private $Controller;
     static private $_Controller;
     
-    public $scripts=array();
+    static private $_self;
+    
+    private $scripts=array();
+    private $scripts_url=array();
     private $styles=array();
     private $includes=array();
     private $codes=array();
@@ -93,6 +96,15 @@ class TiiTemplate extends TiiCore {
         
         return $this;
 	}
+    
+    public function AddScriptURL($file, $idx){
+		if ($this->IsIncluded($file)) return $this;
+		
+		$this->scripts_url[$idx][]=$file;
+		$this->includes[]=$file;
+        
+        return $this;
+    }
 
     /**
      * 
@@ -107,20 +119,32 @@ class TiiTemplate extends TiiCore {
 		}
 		$this->styles[$idx][]=$file;
 		$this->includes[]=$file;
-        
         return $this;
 	}
     
     public function Import($name){
         switch($name){
             case 'jquery':
-                $this->AddScript(TII_PATH_FRAMEWORK.'/vendor/js/jquery-1.4.1.min.js', 0);
+                //$this->AddScript(TII_PATH_FRAMEWORK.'/vendor/js/jquery-1.4.1.min.js', 0);
+                $this->AddScriptURL('http://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js',0);
                 break;
                 
             case 'mbmenu':
                 $this->Import('jquery');
-                $this->AddStyle(TII_PATH_FRAMEWORK.'/vendor/mbmenu/menu.css');
-                $this->AddStyle(TII_PATH_FRAMEWORK.'/vendor/mbmenu/mbMenu.min.js');
+                $this->AddStyle(TII_PATH_FRAMEWORK.'/vendor/mbmenu/css/menu.css');
+                $this->AddScript(TII_PATH_FRAMEWORK.'/vendor/mbmenu/mbMenu.min.js');
+                break;
+                
+            case 'ddmenu':
+                $this->Import('jquery');
+                $this->AddStyle(TII_PATH_FRAMEWORK.'/vendor/ddmenu/css/ddmenu.css');
+                $this->AddScript(TII_PATH_FRAMEWORK.'/vendor/ddmenu/jquery.bdc.ddmenu.min.js');
+                break;
+            
+            case 'droppy':
+                $this->Import('jquery');
+                $this->AddStyle(TII_PATH_FRAMEWORK.'/vendor/droppy/css/droppy.css');
+                $this->AddScript(TII_PATH_FRAMEWORK.'/vendor/droppy/jquery.droppy.js');
                 break;
         }
         return $this;
@@ -162,7 +186,9 @@ class TiiTemplate extends TiiCore {
 
 	    // $this->ProcessTiiTags();
 	    self::$_Controller = $this->Controller;
+        self::$_self = $this;
 	    $this->DOM->set_callback(array('TiiTemplate','ProcessTiiTags'));
+        //var_dump($this->styles);exit;
     }
     
     /**
@@ -220,7 +246,7 @@ class TiiTemplate extends TiiCore {
 	static public function ProcessTiiTags(simple_html_dom_node $_element, $Controller=null){
 		// all the variables defined in this function are starting with underscore (_)
 		// this is to make sure no any defined variable will be override by the extracted variables from the attributes.
-		
+	    //echo '=PROCESS=';	
 		switch($_element->tag){
 			// look for tii tag
 			// eg: <tii type="Module" class="Account" method="LoginControl" params="" base_path="/tiilib/modules" />
@@ -321,22 +347,23 @@ class TiiTemplate extends TiiCore {
      * @param object $html
      * @return TiiTemplate
      */
-    public function SetHeadContent($html) {
+    public function DELETE____SetHeadContent($html) {
         $this->DOM->find('head', 0)->innertext = $html;
         return $this;
     }
     
-    public function GetHTML($node_selector = '') {
-        //throw new Exception();
-        if (! empty($node_selector))
+    public function GetHTML($node_selector = null) {
+        if (! is_null($node_selector))
             $this->html = $this->DOM->find('[id='.$node_selector.']', 0)->outertext();
         else{
-            $this->DOM->root->prepare_innertext();
-            $this->ParseScripts()->ParseStyles()->ParseScriptCodes();
-            $this->html = $this->DOM->root->innertext(false);
+            $this->html = $this->DOM->root->innertext();
+            $this
+                ->ParseScripts()
+                ->ParseStyles()
+                ->ParseScriptCodes()
+            ;
+            $this->html = $this->DOM->root->innertext();
         }
-        //$this->html = str_replace(chr(10), '', $this->html);
-        
         return $this->html;
     }
     
@@ -344,6 +371,14 @@ class TiiTemplate extends TiiCore {
      * @return TiiTemplate
      */ 
     private function ParseScripts(){
+        $urls = TiiHlpArray::Flatten($this->scripts_url);
+        
+        if(is_array($urls)){
+            foreach($urls as $url){
+                $this->AddToHead($url,'<script type="text/javascript" src="%s"></script>');
+            }
+        }
+        
         if(($filename = $this->ParseFiles($this->scripts,'js')) !== false){
             // add this cache file to the template
             $this->AddToHead(TII_URL_ROOT.$filename,'<script type="text/javascript" src="%s"></script>');
@@ -353,8 +388,13 @@ class TiiTemplate extends TiiCore {
     }
     
     private function ParseScriptCodes(){
-        if(! empty($this->codes))
-        $this->AddToHead($this->codes,'<script type="text/javascript">$(function(){%s});</script>');
+        if( empty($this->codes)) return $this;
+        
+        Tii::Import('helper/array.php');
+        $codes = TiiHlpArray::Flatten($this->codes);
+        
+        if(is_array($codes)) $codes = implode(chr(10),$codes);
+        $this->AddToHead($codes,'<script type="text/javascript">$(function(){%s});</script>');
     }
     
     /**
@@ -402,17 +442,20 @@ class TiiTemplate extends TiiCore {
     }
     
     private function AddToHead($html, $format=null){
-        //echo $html;
-        //static $head;
-        //$this->DOM->
-        if (!isset($head)) $head = $this->DOM->find('head', 0);
+
+        /**
+         * @var simple_html_dom_node
+         */
+        static $head;
+
+
+
+        if (!isset($head)) $head = $this->DOM->getElementByTagName('head', 0);
         
         if(! is_null($format) && ! empty($format)) $html = Tii::Out($format,$html).chr(10);
-        //$head->prepare_innertext();
-        $head->innertext = $head->innertext . $html;
-        //$head->appendData($html);
-        //$this->DOM->find('head', 0)->innertext=$this->DOM->find('head', 0)->innertext().$html;
-        //error_log($head->innertext);
+        
+        $head->innertext .= $html;
+        
         return $this;
     }
     

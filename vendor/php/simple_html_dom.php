@@ -1,6 +1,6 @@
 <?php
 /*******************************************************************************
-Version: 1.11 ($Rev: 13 $)
+Version: 1.11 ($Rev: 175 $)
 Website: http://sourceforge.net/projects/simplehtmldom/
 Author: S.C. Chen <me578022@gmail.com>
 Acknowledge: Jose Solorzano (https://sourceforge.net/projects/php-html/)
@@ -89,9 +89,6 @@ class simple_html_dom_node {
     public $parent = null;
     public $_ = array();
     private $dom = null;
-    
-    private $_innertext=''; //added by yasarbayar@gmail.com
-    private $_innertext_prepared = false; //added by yasarbayar@gmail.com
 
     function __construct($dom) {
         $this->dom = $dom;
@@ -166,26 +163,14 @@ class simple_html_dom_node {
     }
 
     // get dom node's inner html
-    function prepare_innertext() {
-        if (isset($this->_[HDOM_INFO_INNER])) {
-            $this->_innertext = $this->_[HDOM_INFO_INNER];
-            return;
-        }
-        if (isset($this->_[HDOM_INFO_TEXT])) {
-            $this->_innertext = $this->dom->restore_noise($this->_[HDOM_INFO_TEXT]);
-            return;
-        }
+    function innertext() {
+        if (isset($this->_[HDOM_INFO_INNER])) return $this->_[HDOM_INFO_INNER];
+        if (isset($this->_[HDOM_INFO_TEXT])) return $this->dom->restore_noise($this->_[HDOM_INFO_TEXT]);
 
         $ret = '';
         foreach($this->nodes as $n)
             $ret .= $n->outertext();
-        $this->_innertext = $ret;
-        $this->_innertext_prepared = true;
-    }
-    
-    function innertext($prepare=true){
-        if($prepare) $this->prepare_innertext();
-        return $this->_innertext;
+        return $ret;
     }
 
     // get dom node's outer text (with tag)
@@ -273,11 +258,6 @@ class simple_html_dom_node {
     }
 
     // find elements by css selector
-	/**
-	 * @param  $selector
-	 * @param  $idx
-	 * @return simple_html_dom_node | array
-	 */
     function find($selector, $idx=null) {
         $selectors = $this->parse_selector($selector);
         if (($count=count($selectors))===0) return array();
@@ -450,12 +430,10 @@ class simple_html_dom_node {
     }
 
     function __set($name, $value) {
-        //if($name=='innertext')echo $name,':',$value,'<hr />';
         switch($name) {
             case 'outertext': return $this->_[HDOM_INFO_OUTER] = $value;
             case 'innertext':
-                if (isset($this->_[HDOM_INFO_TEXT]))
-                    return $this->_[HDOM_INFO_TEXT] = $value;
+                if (isset($this->_[HDOM_INFO_TEXT])) return $this->_[HDOM_INFO_TEXT] = $value;
                 return $this->_[HDOM_INFO_INNER] = $value;
         }
         if (!isset($this->attr[$name])) {
@@ -501,9 +479,6 @@ class simple_html_dom_node {
 // simple html dom parser
 // -----------------------------------------------------------------------------
 class simple_html_dom {
-	/**
-	 * @var simple_html_dom_node
-	 */
     public $root = null;
     public $nodes = array();
     public $callback = null;
@@ -598,11 +573,6 @@ class simple_html_dom {
     }
 
     // find dom node by css selector
-	/**
-	 * @param  $selector
-	 * @param  $idx
-	 * @return simple_html_dom_node|array
-	 */
     function find($selector, $idx=null) {
         return $this->root->find($selector, $idx);
     }

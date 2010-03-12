@@ -21,3 +21,8 @@ interface TiiUI{ //User interface
 	public function SetTemplateEngine(TiiTemplate $object);
 	public function GetHTML();
 }
+
+interface TiiDomDriver{
+	public function FindNode($path);
+	public function InnerHTML($html=null);
+}
